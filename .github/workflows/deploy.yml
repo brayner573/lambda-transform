@@ -28,20 +28,25 @@ jobs:
           role-to-assume: arn:aws:iam::200110254415:role/proyect-user
           aws-region: us-east-1
 
-      - name: Install dependencies and package
+      - name: Install dependencies and package Lambda
         run: |
           pip install -r requirements.txt -t package
           cp lambda_function.py package/
           cd package && zip -r ../function.zip .
 
-      - name: Create or update Lambda function
+      - name: Deploy Lambda function
         run: |
-          zip_size=$(du -b function.zip | cut -f1)
-          if aws lambda get-function --function-name lambda_transformador_20_reglas 2>/dev/null; then
-            aws lambda update-function-code --function-name lambda_transformador_20_reglas --zip-file fileb://function.zip
+          FUNCTION_NAME=lambda_transformador_20_reglas
+
+          if aws lambda get-function --function-name $FUNCTION_NAME 2>/dev/null; then
+            echo "Updating existing Lambda..."
+            aws lambda update-function-code \
+              --function-name $FUNCTION_NAME \
+              --zip-file fileb://function.zip
           else
+            echo "Creating new Lambda..."
             aws lambda create-function \
-              --function-name lambda_transformador_20_reglas \
+              --function-name $FUNCTION_NAME \
               --runtime python3.9 \
               --role arn:aws:iam::200110254415:role/proyect-user \
               --handler lambda_function.lambda_handler \
