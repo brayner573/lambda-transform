@@ -1,10 +1,9 @@
-name: Deploy Lambda from S3
+name: Deploy Lambda Function from S3
 
 on:
   push:
     branches:
       - main
-      - dev
 
 permissions:
   id-token: write
@@ -31,8 +30,8 @@ jobs:
 
       - name: Deploy Lambda from S3
         run: |
-         aws lambda update-function-code \
-         --function-name lambda_function_prod \  # usa esta o la otra
-         --s3-bucket s3-data-entrada-covid-brayner573 \
-         --s3-key lambda/function-20250622-030359.zip \
-         --region us-east-1
+          aws lambda update-function-code \
+            --function-name lambda_function_prod \
+            --s3-bucket s3-data-entrada-covid-brayner573 \
+            --s3-key lambda/function-20250622-030359.zip \
+            --region us-east-1
