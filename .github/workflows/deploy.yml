@@ -36,16 +36,11 @@ jobs:
 
       - name: Upload ZIP to S3
         run: |
-         BUCKET_NAME=s3-data-entrada-covid-brayner573
-         BRANCH=${GITHUB_REF##*/}
-         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-         ZIP_KEY=lambda/function-${TIMESTAMP}.zip
-         aws s3 cp function.zip s3://$BUCKET_NAME/$ZIP_KEY
-         echo "ZIP_KEY=$ZIP_KEY" >> $GITHUB_ENV  
-      - name: Deploy Lambda function from S3
+         aws s3 cp function.zip s3://s3-data-entrada-covid-brayner573/function-latest.zip
+
+      - name: Deploy Lambda from S3
         run: |
-         FUNCTION_NAME=lambda_transformador_20_reglas
          aws lambda update-function-code \
-         --function-name $FUNCTION_NAME \
+         --function-name lambda_transformador_20_reglas \
          --s3-bucket s3-data-entrada-covid-brayner573 \
-         --s3-key $ZIP_KEY      
+         --s3-key function-latest.zip 
