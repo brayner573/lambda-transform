@@ -31,11 +31,8 @@ jobs:
 
       - name: Deploy Lambda from S3
         run: |
-          FUNCTION_NAME=lambda_transformador_20_reglas
-          BUCKET_NAME=s3-data-entrada-covid-brayner573
-          S3_KEY=function.zip
-
-          aws lambda update-function-code \
-            --function-name $FUNCTION_NAME \
-            --s3-bucket $BUCKET_NAME \
-            --s3-key $S3_KEY
+         aws lambda update-function-code \
+         --function-name lambda_function_prod \  # usa esta o la otra
+         --s3-bucket s3-data-entrada-covid-brayner573 \
+         --s3-key lambda/function-20250622-030359.zip \
+         --region us-east-1
