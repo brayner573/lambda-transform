@@ -1,0 +1,51 @@
+name: Deploy Lambda Function
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::200110254415:role/proyect-user
+          aws-region: us-east-1
+
+      - name: Install dependencies and package
+        run: |
+          pip install -r requirements.txt -t package
+          cp lambda_function.py package/
+          cd package && zip -r ../function.zip .
+
+      - name: Create or update Lambda function
+        run: |
+          zip_size=$(du -b function.zip | cut -f1)
+          if aws lambda get-function --function-name lambda_transformador_20_reglas 2>/dev/null; then
+            aws lambda update-function-code --function-name lambda_transformador_20_reglas --zip-file fileb://function.zip
+          else
+            aws lambda create-function \
+              --function-name lambda_transformador_20_reglas \
+              --runtime python3.9 \
+              --role arn:aws:iam::200110254415:role/proyect-user \
+              --handler lambda_function.lambda_handler \
+              --timeout 60 \
+              --memory-size 256 \
+              --zip-file fileb://function.zip
+          fi
