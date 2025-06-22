@@ -15,7 +15,7 @@ def lambda_handler(event, context):
     df = pd.read_excel(io.BytesIO(obj['Body'].read()))
 
     # AQUI APLICAS LAS 20 REGLAS, ejemplo:
-    df = df.dropna()  # ← regla de ejemplo
+    df = df.dropna()  
 
     data_json = df.to_dict(orient='records')
     json_bytes = json.dumps(data_json).encode('utf-8')
