@@ -34,23 +34,18 @@ jobs:
           cp lambda_function.py package/
           cd package && zip -r ../function.zip .
 
-      - name: Deploy Lambda function
+      - name: Upload ZIP to S3
         run: |
-          FUNCTION_NAME=lambda_transformador_20_reglas
-
-          if aws lambda get-function --function-name $FUNCTION_NAME 2>/dev/null; then
-            echo "Updating existing Lambda..."
-            aws lambda update-function-code \
-              --function-name $FUNCTION_NAME \
-              --zip-file fileb://function.zip
-          else
-            echo "Creating new Lambda..."
-            aws lambda create-function \
-              --function-name $FUNCTION_NAME \
-              --runtime python3.9 \
-              --role arn:aws:iam::200110254415:role/proyect-user \
-              --handler lambda_function.lambda_handler \
-              --timeout 60 \
-              --memory-size 256 \
-              --zip-file fileb://function.zip
-          fi
+         BUCKET_NAME=s3-data-entrada-covid-brayner573
+         BRANCH=${GITHUB_REF##*/}
+         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+         ZIP_KEY=lambda/function-${TIMESTAMP}.zip
+         aws s3 cp function.zip s3://$BUCKET_NAME/$ZIP_KEY
+         echo "ZIP_KEY=$ZIP_KEY" >> $GITHUB_ENV  
+      - name: Deploy Lambda function from S3
+        run: |
+         FUNCTION_NAME=lambda_transformador_20_reglas
+         aws lambda update-function-code \
+         --function-name $FUNCTION_NAME \
+         --s3-bucket s3-data-entrada-covid-brayner573 \
+         --s3-key $ZIP_KEY      
