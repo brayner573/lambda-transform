@@ -1,9 +1,10 @@
-name: Deploy Lambda Function
+name: Deploy Lambda from S3
 
 on:
   push:
     branches:
       - main
+      - dev
 
 permissions:
   id-token: write
@@ -28,19 +29,13 @@ jobs:
           role-to-assume: arn:aws:iam::200110254415:role/proyect-user
           aws-region: us-east-1
 
-      - name: Install dependencies and package Lambda
-        run: |
-          pip install -r requirements.txt -t package
-          cp lambda_function.py package/
-          cd package && zip -r ../function.zip .
-
-      - name: Upload ZIP to S3
-        run: |
-         aws s3 cp function.zip s3://s3-data-entrada-covid-brayner573/function-latest.zip
-
       - name: Deploy Lambda from S3
         run: |
-         aws lambda update-function-code \
-         --function-name lambda_transformador_20_reglas \
-         --s3-bucket s3-data-entrada-covid-brayner573 \
-         --s3-key function-latest.zip 
+          FUNCTION_NAME=lambda_transformador_20_reglas
+          BUCKET_NAME=s3-data-entrada-covid-brayner573
+          S3_KEY=function.zip
+
+          aws lambda update-function-code \
+            --function-name $FUNCTION_NAME \
+            --s3-bucket $BUCKET_NAME \
+            --s3-key $S3_KEY
