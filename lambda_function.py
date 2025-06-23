@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     obj = s3.get_object(Bucket=bucket_in, Key=key)
     df = pd.read_excel(io.BytesIO(obj['Body'].read()))
 
-    
+    #Limpieza de datos
     df = df.dropna()  
 
     data_json = df.to_dict(orient='records')
