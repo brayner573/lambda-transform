@@ -15,8 +15,9 @@ def lambda_handler(event, context):
     df = pd.read_excel(io.BytesIO(obj['Body'].read()))
 
     #Limpieza de datos
-    df = df.dropna()  
-    df = df.drop_duplicates
+    df = df.dropna()
+    df = df.drop_duplicates()
+    df = df[df['clasificacion'] == 'CONFIRMADO']
 
     data_json = df.to_dict(orient='records')
     json_bytes = json.dumps(data_json).encode('utf-8')
