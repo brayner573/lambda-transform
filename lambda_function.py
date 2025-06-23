@@ -16,6 +16,7 @@ def lambda_handler(event, context):
 
     #Limpieza de datos
     df = df.dropna()  
+    df = df.drop_duplicates
 
     data_json = df.to_dict(orient='records')
     json_bytes = json.dumps(data_json).encode('utf-8')
