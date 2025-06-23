@@ -17,6 +17,8 @@ def lambda_handler(event, context):
     #Limpieza de datos
     df = df.dropna()
     df = df.drop_duplicates()
+
+    # Filtrar solo casos CONFIRMADOS
     df = df[df['clasificacion'] == 'CONFIRMADO']
 
     data_json = df.to_dict(orient='records')
