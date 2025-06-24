@@ -15,6 +15,7 @@ def lambda_handler(event, context):
     df = pd.read_excel(io.BytesIO(obj['Body'].read()))
 
     #Limpieza de datos
+    #Limpieza de datos
     df = df.dropna()
     df = df.drop_duplicates()
 
